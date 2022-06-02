@@ -23,8 +23,8 @@ public class UsuarioServiceImpl implements IUsuarioService{
 
     @Override
     @Transactional
-    public void save(Usuario usuario) {
-        usuarioDao.save(usuario);
+    public Usuario save(Usuario usuario) {
+        return usuarioDao.save(usuario);
     }
 
     @Override
@@ -35,7 +35,7 @@ public class UsuarioServiceImpl implements IUsuarioService{
 
     @Override
     @Transactional
-    public void delete(Usuario usuario) {
-        usuarioDao.delete(usuario);
+    public void delete(Long id) {
+        usuarioDao.deleteById(id);
     }
 }

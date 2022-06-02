@@ -1,6 +1,9 @@
 package co.edu.uceva.ejemplo01.model.entities;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -11,13 +14,28 @@ public class Usuario implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @NotEmpty(message ="no puede estar vacio")
+    @Size(min=2, max=20, message="el tamaño tiene que estar entre 2 y 20")
+    @Column(nullable=false)
     private String nombre;
+
+    @NotEmpty(message ="no puede estar vacio")
     private String apellido;
+
+    @NotEmpty(message ="no puede estar vacio")
+    @Email(message="no es una dirección de correo bien formada")
+    @Column(nullable=false, unique=true)
     private String email;
 
     @Column(name="fecha")
     @Temporal(TemporalType.DATE)
     private Date creadoEn;
+
+    @PrePersist
+    public void prePersist() {
+        creadoEn = new Date();
+    }
 
     private static final Long serialVersionUID = 1L;
 
