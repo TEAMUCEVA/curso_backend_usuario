@@ -4,6 +4,9 @@ import co.edu.uceva.ejemplo01.model.entities.Usuario;
 import co.edu.uceva.ejemplo01.model.services.IUsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -43,6 +46,12 @@ public class UsuarioRestController {
         return usuarioService.findAll();
     }
 
+    @GetMapping("/usuarios/page/{page}")
+    public Page<Usuario> index(@PathVariable Integer page) {
+        Pageable pageable = PageRequest.of(page, 4);
+        return usuarioService.findAll(pageable);
+    }
+
     /**
      * Metodo para buscar un usuario
      * @param id Id del usuario a buscar
@@ -56,13 +65,13 @@ public class UsuarioRestController {
         try {
             usuario = usuarioService.findById(id);
         } catch(DataAccessException e) {
-            response.put("mensaje", "Error consultando el usuario");
+            response.put("mensaje", "Error al realizar la consulta en la base de datos");
             response.put("error", e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
             return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         if(usuario == null) {
-            response.put("mensaje", "El usuario id: ".concat(id.toString().concat(" no existe.")));
+            response.put("mensaje", "El usuario id: ".concat(id.toString().concat(" no existe en la base de datos!")));
             return new ResponseEntity<Map<String, Object>>(response, HttpStatus.NOT_FOUND);
         }
 
@@ -92,7 +101,7 @@ public class UsuarioRestController {
         try {
             usuarioNew = usuarioService.save(usuario);
         } catch(DataAccessException e) {
-            response.put("mensaje", "Error guardando o actualizando el usuario");
+            response.put("mensaje", "Error al realizar el insert en la base de datos");
             response.put("error", e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
             return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -136,7 +145,7 @@ public class UsuarioRestController {
         if(result.hasErrors()) {
             List<String> errors = result.getFieldErrors()
                     .stream()
-                    .map(err -> "Campo '" + err.getField() +"' "+ err.getDefaultMessage())
+                    .map(err -> "El campo '" + err.getField() +"' "+ err.getDefaultMessage())
                     .collect(Collectors.toList());
             response.put("errors", errors);
             return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
